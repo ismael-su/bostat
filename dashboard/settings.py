@@ -93,23 +93,49 @@ DATABASE_USERNAME = "helodev"
 DATABASE_PASSWORD = "6ZIHH4TdeSxEhM0X"
 
 mongoengine.connect(db=DATABASE_NAME, host=DATABASE_HOST, username=DATABASE_USERNAME, password=DATABASE_PASSWORD)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.dummy'
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy'
-    }
+ 'default': {
+     'ENGINE': 'djongo',
+     'NAME': 'test',
+    #  'CLIENT': {
+    #     'host': "mongodb+srv://helodev:6ZIHH4TdeSxEhM0X@cluster0.xwdtlgq.mongodb.net/?retryWrites=true&w=majority",
+    #  }
+    'ENFORCE_SCHEMA': False,
+    'CLIENT': {
+        # 'host': 'localhost',
+        # 'port': 27017,
+        'host': "mongodb+srv://helodev:6ZIHH4TdeSxEhM0X@cluster0.xwdtlgq.mongodb.net/?ssl=true&ssl_cert_reqs=CERT_NONE&retryWrites=true&w=majority",
+    # #     'username': DATABASE_USERNAME,
+    # #     'password': DATABASE_PASSWORD,
+     },
+    'LOGGING': {
+        'version': 1,
+        'loggers': {
+            'djongo': {
+                'level': 'DEBUG',
+                'propagate': False,                        
+            }
+        },
+        },
+ }
 }
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3'
-    }
-    # 'default': {
-    #     'ENGINE': 'djongo',
-    #     'NAME': 'dashboardmongo',
-    # }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3'
+#     }
+#     # 'default': {
+#     #     'ENGINE': 'djongo',
+#     #     'NAME': 'dashboardmongo',
+#     # }
+# }
 
 
 # Password validation
@@ -155,4 +181,4 @@ MEDIA_ROOT = 'media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'djongo.models.BigAutoField'

@@ -1,128 +1,130 @@
 
-from dataclasses import field
 from datetime import datetime
-from mongoengine import Document, fields
-from pkg_resources import require
+from djongo import models
+ 
+
+class Distributeur(models.Model):
+    _id = models.ObjectIdField()
+    nom_distributeur = models.TextField(blank=False)
+    description_distributeur = models.TextField(blank=False)
+    etat_distributeur = models.BooleanField(blank=False)
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())   
+    
+class Societe(models.Model):
+    _id = models.ObjectIdField()
+    nom_societe = models.TextField(blank=False)
+    description_societe = models.TextField(blank=False)
+    etat_societe = models.BooleanField(default=True)
+    
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
+    
+class Marque(models.Model):
+    _id = models.ObjectIdField()
+    nomarque = models.TextField(blank=False)
+    description_marque = models.TextField(blank=False)
+    societeId = models.EmbeddedField(model_container=Societe)
+    etat_marque = models.BooleanField(default=True)
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
+
+    
+    
+class Operation(models.Model):
+    _id = models.ObjectIdField()
+    libelle_operation = models.TextField(blank=False)
+    description_operation = models.TextField(blank=False)
+    marqueId = models.EmbeddedField(model_container=Marque)
+    
+    etat_operation = models.BooleanField(default=True)
+    etat_fin_operation = models.BooleanField(default=True)
+    
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
+    
+class Produit(models.Model):
+    _id = models.ObjectIdField()
+    titre_produit = models.TextField(blank=False)
+    description_produit = models.TextField(blank=False)
+    
+    etat_operation = models.BooleanField(default=True) # TODO
+    url_redirection_produit = models.TextField(blank=False)
+    url_image_produit = models.TextField(blank=False)
+    
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
+    operationId = models.EmbeddedField(model_container=Operation)
+
+class Puce(models.Model):
+    _id = models.ObjectIdField()
+    numero_puce = models.TextField(blank=False)
+    libelle_puce = models.TextField(blank=False)
+    etat_puce = models.BooleanField(default=True)
+    
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
+    
+    produitId = models.EmbeddedField(model_container=Produit)
+    distributeurId = models.EmbeddedField(model_container=Distributeur)
 
 
-       
-class CustomerAction(Document):
-    
-    gps = fields.StringField() 
-    systeme_exploitation = fields.StringField()
-    version_systeme = fields.StringField()
-    langue = fields.StringField()
-    tamper = fields.StringField()
-    custom_message = fields.StringField()
-    unique_code = fields.StringField()
-    
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
-    
-    idCustomer = fields.ReferenceField('Customer')
-    idProduit = fields.ReferenceField('Produit')
-    idPuce = fields.ReferenceField('Puce')
-    idDistributeur = fields.ReferenceField('Distributeur')
-    
-class Distributeur(Document):
-    
-    nom_distributeur = fields.StringField(required=True)
-    description_distributeur = fields.StringField(required=True)
-    etat_distributeur = fields.BooleanField(required=True)
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())   
-    
-class Marque(Document):
-    
-    nomarque = fields.StringField(required=True)
-    description_marque = fields.StringField(required=True)
-    societeId = fields.ReferenceField('Societe')
-    etat_marque = fields.BooleanField(default=True)
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
-    
-    
-class Operation(Document):
-    
-    libelle_operation = fields.StringField(required=True)
-    description_operation = fields.StringField(required=True)
-    marqueId = fields.ReferenceField('Marque')
-    
-    etat_operation = fields.BooleanField(default=True)
-    etat_fin_operation = fields.BooleanField(default=True)
-    
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
-    
-class Produit(Document):
-    
-    titre_produit = fields.StringField(required=True)
-    description_produit = fields.StringField(required=True)
-    
-    etat_operation = fields.BooleanField(default=True) # TODO
-    url_redirection_produit = fields.StringField(required=True)
-    url_image_produit = fields.StringField(required=True)
-    
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
-    operationId = fields.ReferenceField('Operation')
-
-class Puce(Document):
-    
-    numero_puce = fields.StringField(required=True)
-    libelle_puce = fields.StringField(required=True)
-    etat_puce = fields.BooleanField(default=True)
-    
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
-    
-    produitId = fields.ReferenceField('Produit')
-    distributeurId = fields.ReferenceField('Distributeur')
+ 
 
 
-class Question(Document):
-    jour = fields.StringField(required=True)
-    mois = fields.StringField(required=True)
-    annee = fields.StringField(required=True)
-    enfants = fields.StringField(required=True)
-    
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
-    
-    produitId = fields.ReferenceField('Produit')
-    puceId = fields.ReferenceField('Puce')
-    userId = fields.ReferenceField('Customer')
-    
+class Tamper(models.Model):
+    _id = models.ObjectIdField()
+    tamper = models.TextField(blank=False)
+    url_redirect_product = models.TextField(blank=False)
+    productId = models.EmbeddedField(model_container=Produit)
 
-class Societe(Document):
-    nom_societe = fields.StringField(required=True)
-    description_societe = fields.StringField(required=True)
-    etat_societe = fields.BooleanField(default=True)
+class Customer(models.Model):
+    _id = models.ObjectIdField()
+    firstname = models.TextField(blank=False)
+    lastname = models.TextField(blank=False)
+    phone = models.TextField(blank=False)
+    email = models.TextField(blank=False)
+    password = models.TextField(blank=False)
+    date = models.DateField(default=datetime.now())
+ 
+ 
+class Question(models.Model):
+    _id = models.ObjectIdField()
+    jour = models.TextField(blank=False)
+    mois = models.TextField(blank=False)
+    annee = models.TextField(blank=False)
+    enfants = models.TextField(blank=False)
     
-    date_creation = fields.DateField(default=datetime.now())
-    date_modification = fields.DateField(default=datetime.now())
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
     
-
-class Tamper(Document):
+    produitId = models.EmbeddedField(model_container=Produit)
+    puceId = models.EmbeddedField(model_container=Puce)
+    userId = models.EmbeddedField(model_container=Customer)
+      
     
-    tamper = fields.StringField(required=True)
-    url_redirect_product = fields.StringField(required=True)
-    productId = fields.ReferenceField('Produit')
-
-class Customer(Document):
-    
-    firstname = fields.StringField(required=True)
-    lastname = fields.StringField(required=True)
-    phone = fields.StringField(required=True)
-    email = fields.StringField(required=True)
-    password = fields.StringField(required=True)
-    date = fields.DateField(default=datetime.now())
+class UserPro(models.Model):
+    _id = models.ObjectIdField()
+    name = models.TextField(blank=False)
+    email = models.TextField(blank=False)
     
     
-class UserPro(Document):
-    name = fields.StringField(required=True)
-    email = fields.StringField(required=True)
+class CustomerAction(models.Model):
+    _id = models.ObjectIdField()
     
+    gps = models.TextField() 
+    systeme_exploitation = models.TextField()
+    version_systeme = models.TextField()
+    langue = models.TextField()
+    tamper = models.TextField()
+    custom_message = models.TextField()
+    unique_code = models.TextField()
     
-  
-  
+    date_creation = models.DateField(default=datetime.now())
+    date_modification = models.DateField(default=datetime.now())
+    
+    idCustomer = models.EmbeddedField(model_container=Customer)
+    idProduit = models.EmbeddedField(model_container=Produit)
+    idPuce = models.EmbeddedField(model_container=Puce)
+    idDistributeur = models.EmbeddedField(model_container=Distributeur)
+    
