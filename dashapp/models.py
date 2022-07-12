@@ -1,41 +1,58 @@
 
 from datetime import datetime
 from djongo import models
- 
+
+from django.core.validators import MinLengthValidator
+from django.contrib.auth.models import User
 
 class Distributeur(models.Model):
     _id = models.ObjectIdField()
-    nom_distributeur = models.TextField(blank=False)
+    nom_distributeur = models.CharField(max_length=1000, blank=False)
     description_distributeur = models.TextField(blank=False)
     etat_distributeur = models.BooleanField(blank=False)
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())   
     
+    def __str__(self) -> str:
+        return self.nom_distributeur
+    
 class Societe(models.Model):
     _id = models.ObjectIdField()
-    nom_societe = models.TextField(blank=False)
+    nom_societe = models.CharField(max_length=1000, blank=False)
     description_societe = models.TextField(blank=False)
     etat_societe = models.BooleanField(default=True)
     
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
     
+    def __str__(self) -> str:
+        return self.nom_societe
+    
+    
+    
 class Marque(models.Model):
     _id = models.ObjectIdField()
-    nomarque = models.TextField(blank=False)
+    nomarque = models.CharField(max_length=1000, blank=False)
     description_marque = models.TextField(blank=False)
-    societeId = models.EmbeddedField(model_container=Societe)
+    societeId = models.ForeignKey(Societe, db_column='societeId', on_delete=models.CASCADE)
     etat_marque = models.BooleanField(default=True)
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
+    
+    def __str__(self) -> str:
+        return self.nomarque
+    
+    
+
+
 
     
     
 class Operation(models.Model):
     _id = models.ObjectIdField()
-    libelle_operation = models.TextField(blank=False)
+    libelle_operation = models.CharField(max_length=1000, blank=False)
     description_operation = models.TextField(blank=False)
-    marqueId = models.EmbeddedField(model_container=Marque)
+    marqueId = models.ForeignKey(Marque, db_column='marqueId', on_delete=models.CASCADE)
     
     etat_operation = models.BooleanField(default=True)
     etat_fin_operation = models.BooleanField(default=True)
@@ -43,30 +60,40 @@ class Operation(models.Model):
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
     
+    def __str__(self) -> str:
+        return self.libelle_operation
+    
 class Produit(models.Model):
     _id = models.ObjectIdField()
-    titre_produit = models.TextField(blank=False)
+    titre_produit = models.CharField(max_length=1000, blank=False)
     description_produit = models.TextField(blank=False)
     
     etat_operation = models.BooleanField(default=True) # TODO
-    url_redirection_produit = models.TextField(blank=False)
-    url_image_produit = models.TextField(blank=False)
+    url_redirection_produit = models.CharField(max_length=1000, blank=False)
+    url_image_produit = models.CharField(max_length=1000, blank=False)
     
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
-    operationId = models.EmbeddedField(model_container=Operation)
+    operationId = models.ForeignKey(Operation, db_column='operationId', on_delete=models.CASCADE)
+    
+    
+    def __str__(self) -> str:
+        return self.titre_produit
 
 class Puce(models.Model):
     _id = models.ObjectIdField()
-    numero_puce = models.TextField(blank=False)
-    libelle_puce = models.TextField(blank=False)
+    numero_puce = models.CharField(max_length=1000, blank=False)
+    libelle_puce = models.CharField(max_length=1000, blank=False)
     etat_puce = models.BooleanField(default=True)
     
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
     
-    produitId = models.EmbeddedField(model_container=Produit)
-    distributeurId = models.EmbeddedField(model_container=Distributeur)
+    produitId = models.ForeignKey(Produit, db_column='produitId', on_delete=models.CASCADE)
+    distributeurId = models.ForeignKey(Distributeur, db_column='distributeurId', on_delete=models.CASCADE)
+    
+    def __str__(self) -> str:
+        return self.libelle_puce
 
 
  
@@ -74,57 +101,127 @@ class Puce(models.Model):
 
 class Tamper(models.Model):
     _id = models.ObjectIdField()
-    tamper = models.TextField(blank=False)
-    url_redirect_product = models.TextField(blank=False)
-    productId = models.EmbeddedField(model_container=Produit)
+    tamper = models.CharField(max_length=1000, blank=False)
+    url_redirect_product = models.CharField(max_length=1000, blank=False)
+    productId = models.ForeignKey(Produit, db_column='productId', on_delete=models.CASCADE)
+    
+    def __str__(self) -> str:
+        return self.tamper
 
 class Customer(models.Model):
     _id = models.ObjectIdField()
-    firstname = models.TextField(blank=False)
-    lastname = models.TextField(blank=False)
-    phone = models.TextField(blank=False)
-    email = models.TextField(blank=False)
-    password = models.TextField(blank=False)
+    firstname = models.CharField(max_length=1000, blank=False)
+    lastname = models.CharField(max_length=1000, blank=False)
+    phone = models.CharField(max_length=1000, blank=False)
+    email = models.CharField(max_length=250, blank=False,validators=[MinLengthValidator(4)] , unique=True)
+    password = models.CharField(max_length=1000, blank=False, validators=[MinLengthValidator(8)])
     date = models.DateField(default=datetime.now())
+    
+    def save(self, *args, **kwargs):
+        try:
+            if not self.pk:
+                user = User.objects.create(email=self.email, username=self.email, password=self.password)
+                user.first_name=self.firstname
+                user.last_name=self.lastname
+                user.save()
+            else:
+                user = User.objects.get(email=self.email)
+                user.first_name=self.firstname
+                user.last_name=self.lastname
+                user.save()
+                
+            super(Customer, self).save(*args, **kwargs)
+        except:
+            pass
+    
+    def delete(self):
+        try:
+            
+            user = User.objects.get(email=self.email)
+            user.delete()
+            super(Customer, self).delete()
+        except: pass
+        
+        
+    
+    def __str__(self) -> str:
+        return f"{self.firstname} {self.lastname}"
  
  
 class Question(models.Model):
     _id = models.ObjectIdField()
-    jour = models.TextField(blank=False)
-    mois = models.TextField(blank=False)
-    annee = models.TextField(blank=False)
-    enfants = models.TextField(blank=False)
+    jour = models.CharField(max_length=1000, blank=False)
+    mois = models.CharField(max_length=1000, blank=False)
+    annee = models.CharField(max_length=1000, blank=False)
+    enfants = models.CharField(max_length=1000, blank=False)
     
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
     
-    produitId = models.EmbeddedField(model_container=Produit)
-    puceId = models.EmbeddedField(model_container=Puce)
-    userId = models.EmbeddedField(model_container=Customer)
+    produitId = models.ForeignKey(Produit, db_column='produitId', on_delete=models.CASCADE)
+    puceId = models.ForeignKey(Puce, db_column='puceId', on_delete=models.CASCADE)
+    userId = models.ForeignKey(Customer, db_column='userId', on_delete=models.CASCADE)
+    
+    def __str__(self) -> str:
+        return f"{self.jour} {self.mois} {self.annee}"
+    
+    
       
     
 class UserPro(models.Model):
     _id = models.ObjectIdField()
-    name = models.TextField(blank=False)
-    email = models.TextField(blank=False)
+    name = models.CharField(max_length=1000, blank=False)
+    email = models.CharField(max_length=1000, blank=False)
+    
+    def save(self, *args, **kwargs):
+        try:
+            if not self.pk:
+                user: User
+                user = User.objects.create(email=self.email, username=self.email, password=self.password)
+                user.first_name=self.name
+                user.is_staff
+                #user.is_su
+                user.save()
+            else:
+                user = User.objects.get(email=self.email)
+                user.first_name=self.name
+                user.save()
+                
+            super(UserPro, self).save(*args, **kwargs)
+        except:
+            pass
+    
+    def delete(self):
+        try:
+            
+            user = User.objects.get(email=self.email)
+            user.delete()
+            super(UserPro, self).delete()
+        except: pass
+    
+    def __str__(self) -> str:
+        return f"{self.email}"
     
     
 class CustomerAction(models.Model):
     _id = models.ObjectIdField()
     
-    gps = models.TextField() 
-    systeme_exploitation = models.TextField()
-    version_systeme = models.TextField()
-    langue = models.TextField()
-    tamper = models.TextField()
-    custom_message = models.TextField()
-    unique_code = models.TextField()
+    gps = models.CharField(max_length=1000, ) 
+    systeme_exploitation = models.CharField(max_length=1000, )
+    version_systeme = models.CharField(max_length=1000, )
+    langue = models.CharField(max_length=1000, )
+    tamper = models.CharField(max_length=1000, )
+    custom_message = models.CharField(max_length=1000, )
+    unique_code = models.CharField(max_length=1000, )
     
     date_creation = models.DateField(default=datetime.now())
     date_modification = models.DateField(default=datetime.now())
     
-    idCustomer = models.EmbeddedField(model_container=Customer)
-    idProduit = models.EmbeddedField(model_container=Produit)
-    idPuce = models.EmbeddedField(model_container=Puce)
-    idDistributeur = models.EmbeddedField(model_container=Distributeur)
+    idCustomer = models.ForeignKey(Customer, db_column='idCustomer', on_delete=models.CASCADE)
+    idProduit = models.ForeignKey(Produit, db_column='idProduit', on_delete=models.CASCADE)
+    idPuce = models.ForeignKey(Puce,db_column='idPuce', on_delete=models.CASCADE)
+    idDistributeur = models.ForeignKey(Distributeur, db_column='idDistributeur', on_delete=models.CASCADE)
+    
+    def __str__(self) -> str:
+        return f"{self.tamper} {self.idCustomer}"
     

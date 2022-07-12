@@ -2,9 +2,15 @@
 {% extends 'dashboard_base.html' %}
 
 {% load static tailwind_tags %}
-{% block content %}
+{% block container_header %}
 
+<div id="map" class="w-full h-full">
 
+</div>
 
-{% endblock content %}
+{% endblock container_header %}
+
+{ % block container_body %}
+<p>body</p>
+{ % endblock container_body %}
 

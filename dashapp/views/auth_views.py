@@ -20,15 +20,12 @@ def sign_in_view(request: HttpRequest):
 
     
     if request.method == 'POST':
-        print('PST')
         form = SignInForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            print(username, password)
             
             user = authenticate(username=username, password=password)
-            print(user)
             if user is not None:
                 if user.is_active:
                     login(request, user)
@@ -40,7 +37,6 @@ def sign_in_view(request: HttpRequest):
                 
         
     else:
-        print('GET')
         form = SignInForm()
         
     rendered = render_to_string('auth/sign_in.html', {'form': form})
