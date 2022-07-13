@@ -41,7 +41,26 @@
       window.myPie = new Chart(ctx4, marques_config);
     };
 
-  </script>
+</script>
+
+<script>
+    $(document).ready( function () {
+
+
+      var oTable = $('#myTable').DataTable({
+        dom: '<"top"i>rt<"bottom"lp><"clear">',
+        buttons: [
+        'csv'
+        ]
+        
+      });
+      $('#bostatfilter_Marque').keyup( function () {
+        oTable.search(this.value).draw();
+        } );
+  } );
+   // var table_dataset = [{{ table_dataset|safe }}]
+
+</script>
 
 
   <div class="container flex overflow-scroll w-full">
@@ -71,6 +90,73 @@
 {% endblock container_header %}
 
 {% block container_body %}
+
+
+<div class="flex flex-col h-full ">
+  <div class="overflow-x-auto sm:-mx-6 lg:-mx-8 h-full">
+    <div class="py-4 inline-block min-w-full sm:px-6 lg:px-8 h-full">
+      <div class="overflow-hidden  flex flex-col h-full ">
+        <table id='myTable' class="min-w-full text-center min-h-full flex-1">
+          <thead class="border-b bg-gray-800 max-w-full  overflow-scroll">
+            <tr class="overflow-scroll">
+             
+              <th scope="col" class="text-sm font-medium text-white px-6 py-4">
+                #
+              </th>
+              <th scope="col" class="text-sm font-medium text-white px-6 py-4">
+                Nom marque
+              </th>
+              <th scope="col" class="text-sm font-medium text-white px-6 py-4">
+                Description Marque
+              </th>
+              <th scope="col" class="text-sm font-medium text-white px-6 py-4">
+                Etat Marque
+              </th>
+              <th scope="col" class="text-sm font-medium text-white px-6 py-4">
+                Date Creation
+              </th>
+              <th scope="col" class="text-sm font-medium text-white px-6 py-4">
+                Date Modification
+              </th>
+            </tr>
+          </thead class="border-b">
+          <tbody>
+
+            {% for marque in table_dataset %}
+            <tr class="bg-white border-b">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ forloop.counter }}
+              </td>
+              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                {{ marque.nomarque }}
+              </td>
+              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                {{ marque.description_marque }}
+              </td>
+              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                {% if marque.etat_marque %}
+                Active
+                {% else %}
+                Inactive
+                {% endif %}
+              
+              </td>
+              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                {{ marque.date_creation }}
+              </td>
+              <td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                {{ marque.date_modification }}
+              </td>
+            </tr class="bg-white border-b">
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 {% endblock container_body %}
 

@@ -4,8 +4,21 @@
 	<head>
     <title>Smart Dashboard</title>
 	<link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/date-1.1.2/sl-1.4.0/datatables.min.css"/>
+ 
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/date-1.1.2/sl-1.4.0/datatables.min.js"></script>
+
+	<link href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+  
+
+  
 
 
 
@@ -150,19 +163,21 @@
             
         </div> {% endcomment %}
         <div class="container mx-auto flex flex-1 flex-col md:flex-row w-11/12 ">
-          <div class="column-1 flex flex-col items-center justify-end w-full md:w-3/12 h-full border-2 border-dotted md:mx-2 my-2 rounded-md">
+          <div class="column-1 flex flex-col items-center justify-center w-full md:w-3/12 h-full border-2 border-dotted md:mx-2 my-2 rounded-md">
             <p class="text-center font-bold">
                 Filtres
             </p>
             {% with 'Societe Marque Product Distributor Operation Chip Customer' as filters_list %}
     
                 {% for filtre in filters_list.split %}
-    
+                {% with input_id="bostatfilter_"|add:filtre %}
+
                     <div class="flex m-4">
                         <div class="w-20 flex items-center justify-center bg-gray-100 border border-r-0 border-blue-lighter rounded-l text-blue-dark">{{ filtre }}</div>
-                        <input type="text" class="py-2 px-2 text-sm border border-gray-300 rounded-r" />
+                        <input id={{ input_id }} type="text" class="py-2 px-2 text-sm border border-gray-300 rounded-r" />
                     </div>
     
+                    {% endwith %}
                 {%endfor %}
     
             {% endwith%}

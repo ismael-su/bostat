@@ -17,15 +17,26 @@ def dashboard_view(request: HttpRequest):
     
     marque_labels = []
     marque_data = []
+    
+    
 
     
     marque_queryset = Marque.objects.all()[:5]
     for marque in marque_queryset:
         marque: Marque
         marque_labels.append(marque.nomarque)
+        # count = 
         marque_data.append(10)
 
-    rendered = render_to_string('dashboard/home.html', {'request': request, 'labels': marque_labels, 'data':marque_data})
+    rendered = render_to_string(
+        'dashboard/home.html', 
+        {
+            'request': request,
+            'labels': marque_labels,
+            'data':marque_data,
+            'table_dataset': marque_queryset
+        }
+    )
     return HttpResponse(rendered)
 
 @login_required(login_url='/auth/sign_in')
