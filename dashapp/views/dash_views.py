@@ -6,7 +6,8 @@ from django.template.loader import render_to_string
 from django.http.request import HttpRequest
 from django.contrib.auth.decorators import login_required
 from dashapp.models import (
-    Marque
+    Marque,
+    Produit
 )
 
 
@@ -51,6 +52,16 @@ def operation_view(request: HttpRequest):
 
 @login_required(login_url='/auth/sign_in')
 def products_view(request: HttpRequest):
-    rendered = render_to_string('dashboard/products.html', {'request': request})
+    
+    
+    product_queryset = Produit.objects.all()[:5]
+
+    rendered = render_to_string(
+        'dashboard/products.html', 
+        {
+            'request': request,
+            'table_dataset': product_queryset
+        }
+    )
     return HttpResponse(rendered)
 
